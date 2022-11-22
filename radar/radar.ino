@@ -1,8 +1,8 @@
-#include <SR04.h>
+#include <HCSR04.h>
 #include <Servo.h>
 
 Servo servo;
-SR04 hc( 3, 2 );
+HCRS04 hc( 3, 2 );
 
 int pos    = 0;
 int direct = 1;
@@ -25,7 +25,7 @@ void forward() {
 
 void backward() {
   pos = pos - 1;
-  
+
   servo.write( pos );
 
   if ( pos == 0 ) {
@@ -43,7 +43,6 @@ void rateLimitedRead() {
 }
 
 void loop() {
-  
   if ( direct == 1 ) {
     forward();
   } else {
