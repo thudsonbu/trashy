@@ -1,33 +1,35 @@
 #include <Servo.h>
 
+// Motors
+
 // Front Right (FR) Motor
-#define RightMotorDirPin1 22 // Front Right Motor direction pin 1 to Model-Y M_B IN1 (K1)
-#define RightMotorDirPin2 24 // Front Right Motor direction pin 2 to Model-Y M_B IN2 (K1)
-#define SpeedPinFR 9         // Front Wheel PWM pin connect Model-Y M_B ENA
+#define FR_DIR_PIN_F 22 // Front right motor forward direction pin
+#define FR_DIR_PIN_R 24 // Front right motor reverse direction pin
+#define FR_SPEED_PIN 9  // Front right motor speed pin
 
 // Front Left (FL) Motor
-#define LeftMotorDirPin1 26 // Front Left Motor direction pin 1 to Model-Y M_B IN3 (K3)
-#define LeftMotorDirPin2 28 // Front Left Motor direction pin 2 to Model-Y M_B IN4 (K3)
-#define SpeedPinFL 10       // Front Wheel PWM pin connect Model-Y M_B ENB
+#define FL_DIR_PIN_F 26 // Front left motor forward direction pin
+#define FL_DIR_PIN_R 28 // Front left motor reverse direction pin
+#define FL_SPEED_PIN 10 // Front left motor speed pin
 
 // Rear Right (RR) Motor
-#define RightMotorDirPin1B 5 // Rear Right Motor direction pin 1 to Model-Y M_A IN1 (K1)
-#define RightMotorDirPin2B 6 // Rear Right Motor direction pin 2 to Model-Y M_A IN2 (K1)
-#define SpeedPinRR 11        // Rear Wheel PWM pin connect Model-Y M_A ENA
+#define RR_DIR_PIN_F 5 // Rear right Motor forward direction pin
+#define RR_DIR_PIN_R 6 // Rear right motor reverse direction pin
+#define RR_SPEED_PIN 11 // Rear right motor speed pin
 
 // Rear Left (RL) Motor
-#define LeftMotorDirPin1B 7 // Rear Left Motor direction pin 1 to Model-Y M_A IN3 (K3)
-#define LeftMotorDirPin2B 8 // Rear Left Motor direction pin 2 to Model-Y M_A IN4 (K3)
-#define SpeedPinRL 12       // Rear Wheel PWM pin connect Model-Y M_A ENB
-
-#define LPT 2 // scan loop counter
-
-#define SERVO_PIN 13 // servo connect to D5
-
-#define ECHO_PIN 31 // Ultrasonic Echo pin connect to A5
-#define TRIG_PIN 30 // Ultrasonic Trig pin connect to A4
+#define RL_DIR_PIN_F 7 // Rear left motor forward direction pin
+#define RL_DIR_PIN_R 8 // Rear left motor reverse direction pin
+#define RL_SPEED_PIN 12 // Rear left motor speed pin
 
 #define SPEED 120
+
+// Servo
+#define SERVO_PIN 13 // servo connect to D5
+
+// Ultrasonic Sensor
+#define ECHO_PIN 31 // Ultrasonic Echo pin connect to A5
+#define TRIG_PIN 30 // Ultrasonic Trig pin connect to A4
 
 const int minimum_distance = 30; // Minimum distance from obstacle before evasive action
 
@@ -44,31 +46,36 @@ int seconds(int seconds) {
 // Setup control pins for OUTPUT to motor driver (L298N)
 void initialize_motor_driver()
 {
-  pinMode(RightMotorDirPin1, OUTPUT);
-  pinMode(RightMotorDirPin2, OUTPUT);
+  pinMode(FR_DIR_PIN_F, OUTPUT);
+  pinMode(FR_DIR_PIN_R, OUTPUT);
 
-  pinMode(LeftMotorDirPin1, OUTPUT);
-  pinMode(LeftMotorDirPin2, OUTPUT);
+  pinMode(FL_DIR_PIN_F, OUTPUT);
+  pinMode(FL_DIR_PIN_R, OUTPUT);
 
-  pinMode(RightMotorDirPin1B, OUTPUT);
-  pinMode(RightMotorDirPin2B, OUTPUT);
+  pinMode(RR_DIR_PIN_F, OUTPUT);
+  pinMode(RR_DIR_PIN_R, OUTPUT);
 
-  pinMode(LeftMotorDirPin1B, OUTPUT);
-  pinMode(LeftMotorDirPin2B, OUTPUT);
+  pinMode(RL_DIR_PIN_F, OUTPUT);
+  pinMode(RL_DIR_PIN_R, OUTPUT);
 
-  pinMode(SpeedPinFR, OUTPUT);
-  pinMode(SpeedPinFL, OUTPUT);
+  pinMode(FR_SPEED_PIN, OUTPUT);
+  pinMode(FL_SPEED_PIN, OUTPUT);
 
-  pinMode(SpeedPinRL, OUTPUT);
-  pinMode(SpeedPinRR, OUTPUT);
+  pinMode(RL_SPEED_PIN, OUTPUT);
+  pinMode(RR_SPEED_PIN, OUTPUT);
 }
 
-void set_motor_speed(int frontLeft, int frontRight, int rearLeft, int rearRight)
+void set_each_motor_speed(int front_left, int front_right, int rear_left, int rear_right)
 {
-  analogWrite(SpeedPinFL, frontLeft);
-  analogWrite(SpeedPinFR, frontRight);
-  analogWrite(SpeedPinRR, rearRight);
-  analogWrite(SpeedPinRL, rearLeft);
+  analogWrite(FL_SPEED_PIN, front_left);
+  analogWrite(FR_SPEED_PIN, front_right);
+  analogWrite(RL_SPEED_PIN, rear_left);
+  analogWrite(RR_SPEED_PIN, rear_right);
+}
+
+void set_all_motor_speed(int speed)
+{
+  set_each_motor_speed(speed, speed, speed, speed);
 }
 
 // Each motor has two pins. One sets the motor direction to forward while the
@@ -77,74 +84,74 @@ void set_motor_speed(int frontLeft, int frontRight, int rearLeft, int rearRight)
 
 void set_fr_forward()
 {
-  digitalWrite(RightMotorDirPin1, HIGH);
-  digitalWrite(RightMotorDirPin2, LOW);
+  digitalWrite(FR_DIR_PIN_F, HIGH);
+  digitalWrite(FR_DIR_PIN_R, LOW);
 }
 
 void set_fr_reverse()
 {
-  digitalWrite(RightMotorDirPin1, LOW);
-  digitalWrite(RightMotorDirPin2, HIGH);
+  digitalWrite(FR_DIR_PIN_F, LOW);
+  digitalWrite(FR_DIR_PIN_R, HIGH);
 }
 
 void stop_fr()
 {
-  digitalWrite(RightMotorDirPin1, LOW);
-  digitalWrite(RightMotorDirPin2, LOW);
+  digitalWrite(FR_DIR_PIN_F, LOW);
+  digitalWrite(FR_DIR_PIN_R, LOW);
 }
 
 void set_fl_forward()
 {
-  digitalWrite(LeftMotorDirPin1, HIGH);
-  digitalWrite(LeftMotorDirPin2, LOW);
+  digitalWrite(FL_DIR_PIN_F, HIGH);
+  digitalWrite(FL_DIR_PIN_R, LOW);
 }
 
 void set_fl_reverse()
 {
-  digitalWrite(LeftMotorDirPin1, LOW);
-  digitalWrite(LeftMotorDirPin2, HIGH);
+  digitalWrite(FL_DIR_PIN_F, LOW);
+  digitalWrite(FL_DIR_PIN_R, HIGH);
 }
 
 void stop_fl()
 {
-  digitalWrite(LeftMotorDirPin1, LOW);
-  digitalWrite(LeftMotorDirPin2, LOW);
+  digitalWrite(FL_DIR_PIN_F, LOW);
+  digitalWrite(FL_DIR_PIN_R, LOW);
 }
 
 void set_rr_forward()
 {
-  digitalWrite(RightMotorDirPin1B, HIGH);
-  digitalWrite(RightMotorDirPin2B, LOW);
+  digitalWrite(RR_DIR_PIN_F, HIGH);
+  digitalWrite(RR_DIR_PIN_R, LOW);
 }
 
 void set_rr_reverse()
 {
-  digitalWrite(RightMotorDirPin1B, LOW);
-  digitalWrite(RightMotorDirPin2B, HIGH);
+  digitalWrite(RR_DIR_PIN_F, LOW);
+  digitalWrite(RR_DIR_PIN_R, HIGH);
 }
 
 void stop_rr()
 {
-  digitalWrite(RightMotorDirPin1B, LOW);
-  digitalWrite(RightMotorDirPin2B, LOW);
+  digitalWrite(RR_DIR_PIN_F, LOW);
+  digitalWrite(RR_DIR_PIN_R, LOW);
 }
 
 void set_rl_forward()
 {
-  digitalWrite(LeftMotorDirPin1B, HIGH);
-  digitalWrite(LeftMotorDirPin2B, LOW);
+  digitalWrite(RL_DIR_PIN_F, HIGH);
+  digitalWrite(RL_DIR_PIN_R, LOW);
 }
 
 void set_rl_reverse()
 {
-  digitalWrite(LeftMotorDirPin1B, LOW);
-  digitalWrite(LeftMotorDirPin2B, HIGH);
+  digitalWrite(RL_DIR_PIN_F, LOW);
+  digitalWrite(RL_DIR_PIN_R, HIGH);
 }
 
 void stop_rl()
 {
-  digitalWrite(LeftMotorDirPin1B, LOW);
-  digitalWrite(LeftMotorDirPin2B, LOW);
+  digitalWrite(RL_DIR_PIN_F, LOW);
+  digitalWrite(RL_DIR_PIN_R, LOW);
 }
 
 void stop_motors()
@@ -154,7 +161,7 @@ void stop_motors()
   stop_rr();
   stop_rl();
 
-  set_motor_speed(0, 0, 0, 0);
+  set_each_motor_speed(0, 0, 0, 0);
 }
 
 void go_forward()
@@ -165,7 +172,7 @@ void go_forward()
   set_rr_forward();
   set_rl_forward();
 
-  set_motor_speed(SPEED, SPEED, SPEED, SPEED);
+  set_all_motor_speed(SPEED);
 }
 
 void go_reverse()
@@ -176,7 +183,7 @@ void go_reverse()
   set_rr_reverse();
   set_rl_reverse();
 
-  set_motor_speed(SPEED, SPEED, SPEED, SPEED);
+  set_all_motor_speed(SPEED);
 }
 
 void rotate_left()
@@ -187,7 +194,7 @@ void rotate_left()
   set_rr_forward();
   set_rl_reverse();
 
-  set_motor_speed(SPEED, SPEED, SPEED, SPEED);
+  set_all_motor_speed(SPEED);
 }
 
 void rotate_right()
@@ -198,7 +205,7 @@ void rotate_right()
   set_rr_reverse();
   set_rl_forward();
 
-  set_motor_speed(SPEED, SPEED, SPEED, SPEED);
+  set_all_motor_speed(SPEED);
 }
 
 ////// RADAR //////
@@ -225,7 +232,7 @@ void initialize_radar_servo()
   delay(seconds(2));
 
   radar_servo.write(90);
-  delay(seconds(2));
+  delay(seconds(5));
 }
 
 // Take a reading from the ultrasonic sensor
@@ -234,7 +241,7 @@ int take_radar_reading()
   long obstacle_distance;
 
   digitalWrite(TRIG_PIN, LOW);
-  delay(Microseconds(5));
+  delayMicroseconds(5);
 
   digitalWrite(TRIG_PIN, HIGH);
   delayMicroseconds(15);
@@ -248,11 +255,14 @@ int take_radar_reading()
 }
 
 // Check if obstacle within minimum distance
-int check_for_obstacle()
+bool check_for_obstacle()
 {
-  int obstacle_distance = take_radar_reading();
+  // Take multiple reading to avoid noise
+  int obstacle_distance_1 = take_radar_reading();
+  int obstacle_distance_2 = take_radar_reading();
 
-  if (obstacle_distance >= minimum_distance) {
+  if (obstacle_distance_1 >= minimum_distance &&
+      obstacle_distance_2 >= minimum_distance) {
     return false;
   }
 
@@ -274,5 +284,12 @@ void setup()
 
 void loop()
 {
-
+  if (check_for_obstacle()) {
+    stop_motors();
+    rotate_left();
+    delay(seconds(1));
+    stop_motors();
+  } else {
+    go_forward();
+  }
 }

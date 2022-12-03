@@ -73,14 +73,14 @@ void go_back() // Reverse
 
 void stop_Stop() // Stop
 {
-  digitalWrite(RightMotorDirPin1, LOW);
-  digitalWrite(RightMotorDirPin2, LOW);
-  digitalWrite(LeftMotorDirPin1, LOW);
-  digitalWrite(LeftMotorDirPin2, LOW);
+  digitalWrite(FR_DIR_PIN_F, LOW);
+  digitalWrite(FR_DIR_PIN_R, LOW);
+  digitalWrite(FL_DIR_PIN_F, LOW);
+  digitalWrite(FL_DIR_PIN_R, LOW);
   digitalWrite(RightMotorDirPin1B, LOW);
-  digitalWrite(RightMotorDirPin2B, LOW);
-  digitalWrite(LeftMotorDirPin1B, LOW);
-  digitalWrite(LeftMotorDirPin2B, LOW);
+  digitalWrite(RR_DIR_PIN_R, LOW);
+  digitalWrite(RL_DIR_PIN_F, LOW);
+  digitalWrite(RL_DIR_PIN_R, LOW);
   set_Motorspeed(0, 0, 0, 0);
 }
 
@@ -95,45 +95,45 @@ void set_Motorspeed(int leftFront, int rightFront, int leftBack, int rightBack)
 
 void FR_fwd() // front-right wheel forward turn
 {
-  digitalWrite(RightMotorDirPin1, HIGH);
-  digitalWrite(RightMotorDirPin2, LOW);
+  digitalWrite(FR_DIR_PIN_F, HIGH);
+  digitalWrite(FR_DIR_PIN_R, LOW);
 }
 void FR_bck() // front-right wheel backward turn
 {
-  digitalWrite(RightMotorDirPin1, LOW);
-  digitalWrite(RightMotorDirPin2, HIGH);
+  digitalWrite(FR_DIR_PIN_F, LOW);
+  digitalWrite(FR_DIR_PIN_R, HIGH);
 }
 void FL_fwd() // front-left wheel forward turn
 {
-  digitalWrite(LeftMotorDirPin1, HIGH);
-  digitalWrite(LeftMotorDirPin2, LOW);
+  digitalWrite(FL_DIR_PIN_F, HIGH);
+  digitalWrite(FL_DIR_PIN_R, LOW);
 }
 void FL_bck() // front-left wheel backward turn
 {
-  digitalWrite(LeftMotorDirPin1, LOW);
-  digitalWrite(LeftMotorDirPin2, HIGH);
+  digitalWrite(FL_DIR_PIN_F, LOW);
+  digitalWrite(FL_DIR_PIN_R, HIGH);
 }
 
 void RR_fwd() // rear-right wheel forward turn
 {
   digitalWrite(RightMotorDirPin1B, HIGH);
-  digitalWrite(RightMotorDirPin2B, LOW);
+  digitalWrite(RR_DIR_PIN_R, LOW);
 }
 
 void RR_bck() // rear-right wheel backward turn
 {
   digitalWrite(RightMotorDirPin1B, LOW);
-  digitalWrite(RightMotorDirPin2B, HIGH);
+  digitalWrite(RR_DIR_PIN_R, HIGH);
 }
 void RL_fwd() // rear-left wheel forward turn
 {
-  digitalWrite(LeftMotorDirPin1B, HIGH);
-  digitalWrite(LeftMotorDirPin2B, LOW);
+  digitalWrite(RL_DIR_PIN_F, HIGH);
+  digitalWrite(RL_DIR_PIN_R, LOW);
 }
 void RL_bck() // rear-left wheel backward turn
 {
-  digitalWrite(LeftMotorDirPin1B, LOW);
-  digitalWrite(LeftMotorDirPin2B, HIGH);
+  digitalWrite(RL_DIR_PIN_F, LOW);
+  digitalWrite(RL_DIR_PIN_R, HIGH);
 }
 
 /*detection of ultrasonic distance*/
@@ -329,19 +329,19 @@ void auto_avoidance()
 void setup()
 {
   /*setup L298N pin mode*/
-  pinMode(RightMotorDirPin1, OUTPUT);
-  pinMode(RightMotorDirPin2, OUTPUT);
+  pinMode(FR_DIR_PIN_F, OUTPUT);
+  pinMode(FR_DIR_PIN_R, OUTPUT);
   pinMode(speedPinL, OUTPUT);
 
-  pinMode(LeftMotorDirPin1, OUTPUT);
-  pinMode(LeftMotorDirPin2, OUTPUT);
+  pinMode(FL_DIR_PIN_F, OUTPUT);
+  pinMode(FL_DIR_PIN_R, OUTPUT);
   pinMode(speedPinR, OUTPUT);
   pinMode(RightMotorDirPin1B, OUTPUT);
-  pinMode(RightMotorDirPin2B, OUTPUT);
+  pinMode(RR_DIR_PIN_R, OUTPUT);
   pinMode(speedPinLB, OUTPUT);
 
-  pinMode(LeftMotorDirPin1B, OUTPUT);
-  pinMode(LeftMotorDirPin2B, OUTPUT);
+  pinMode(RL_DIR_PIN_F, OUTPUT);
+  pinMode(RL_DIR_PIN_R, OUTPUT);
   pinMode(speedPinRB, OUTPUT);
 
   stop_Stop(); // stop move
