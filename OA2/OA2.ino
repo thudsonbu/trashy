@@ -270,8 +270,6 @@ void setup()
   initialize_radar_servo();
 
   stop_motors();
-
-
 }
 
 void loop()
