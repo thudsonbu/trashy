@@ -29,14 +29,17 @@
 
 #define SPEED 120
 
+const int minimum_distance = 30; // Minimum distance from obstacle before evasive action
+
 Servo radar_servo;
 
-///////// UTILS ////////
+////// UTILS //////
+
 int seconds(int seconds) {
   return seconds * 1000;
 }
 
-///////// MOTORS //////////
+////// MOTORS //////
 
 // Setup control pins for OUTPUT to motor driver (L298N)
 void initialize_motor_driver()
@@ -68,22 +71,137 @@ void set_motor_speed(int frontLeft, int frontRight, int rearLeft, int rearRight)
   analogWrite(SpeedPinRL, rearLeft);
 }
 
-void stop_motors()
+// Each motor has two pins. One sets the motor direction to forward while the
+// other sets the motor direction to reverse. These are utility functions
+// to set each motors direction.
+
+void set_fr_forward()
+{
+  digitalWrite(RightMotorDirPin1, HIGH);
+  digitalWrite(RightMotorDirPin2, LOW);
+}
+
+void set_fr_reverse()
+{
+  digitalWrite(RightMotorDirPin1, LOW);
+  digitalWrite(RightMotorDirPin2, HIGH);
+}
+
+void stop_fr()
 {
   digitalWrite(RightMotorDirPin1, LOW);
   digitalWrite(RightMotorDirPin2, LOW);
+}
 
+void set_fl_forward()
+{
+  digitalWrite(LeftMotorDirPin1, HIGH);
+  digitalWrite(LeftMotorDirPin2, LOW);
+}
+
+void set_fl_reverse()
+{
+  digitalWrite(LeftMotorDirPin1, LOW);
+  digitalWrite(LeftMotorDirPin2, HIGH);
+}
+
+void stop_fl()
+{
   digitalWrite(LeftMotorDirPin1, LOW);
   digitalWrite(LeftMotorDirPin2, LOW);
+}
 
+void set_rr_forward()
+{
+  digitalWrite(RightMotorDirPin1B, HIGH);
+  digitalWrite(RightMotorDirPin2B, LOW);
+}
+
+void set_rr_reverse()
+{
+  digitalWrite(RightMotorDirPin1B, LOW);
+  digitalWrite(RightMotorDirPin2B, HIGH);
+}
+
+void stop_rr()
+{
   digitalWrite(RightMotorDirPin1B, LOW);
   digitalWrite(RightMotorDirPin2B, LOW);
+}
 
+void set_rl_forward()
+{
+  digitalWrite(LeftMotorDirPin1B, HIGH);
+  digitalWrite(LeftMotorDirPin2B, LOW);
+}
+
+void set_rl_reverse()
+{
+  digitalWrite(LeftMotorDirPin1B, LOW);
+  digitalWrite(LeftMotorDirPin2B, HIGH);
+}
+
+void stop_rl()
+{
   digitalWrite(LeftMotorDirPin1B, LOW);
   digitalWrite(LeftMotorDirPin2B, LOW);
+}
+
+void stop_motors()
+{
+  stop_fr();
+  stop_fl();
+  stop_rr();
+  stop_rl();
 
   set_motor_speed(0, 0, 0, 0);
 }
+
+void go_forward()
+{
+  set_fr_forward();
+  set_fl_forward();
+
+  set_rr_forward();
+  set_rl_forward();
+
+  set_motor_speed(SPEED, SPEED, SPEED, SPEED);
+}
+
+void go_reverse()
+{
+  set_fr_reverse();
+  set_fl_reverse();
+
+  set_rr_reverse();
+  set_rl_reverse();
+
+  set_motor_speed(SPEED, SPEED, SPEED, SPEED);
+}
+
+void rotate_left()
+{
+  set_fr_forward();
+  set_fl_reverse();
+
+  set_rr_forward();
+  set_rl_reverse();
+
+  set_motor_speed(SPEED, SPEED, SPEED, SPEED);
+}
+
+void rotate_right()
+{
+  set_fr_reverse();
+  set_fl_forward();
+
+  set_rr_reverse();
+  set_rl_forward();
+
+  set_motor_speed(SPEED, SPEED, SPEED, SPEED);
+}
+
+////// RADAR //////
 
 // Setup ultrasonic pins make sure that ultrasonic sensor is not echoing
 // before start
@@ -110,6 +228,39 @@ void initialize_radar_servo()
   delay(seconds(2));
 }
 
+// Take a reading from the ultrasonic sensor
+int take_radar_reading()
+{
+  long obstacle_distance;
+
+  digitalWrite(TRIG_PIN, LOW);
+  delay(Microseconds(5));
+
+  digitalWrite(TRIG_PIN, HIGH);
+  delayMicroseconds(15);
+
+  digitalWrite(TRIG_PIN, LOW);
+
+  obstacle_distance = pulseIn(ECHO_PIN, HIGH);
+  obstacle_distance = obstacle_distance * 0.01657;
+
+  return round(obstacle_distance);
+}
+
+// Check if obstacle within minimum distance
+int check_for_obstacle()
+{
+  int obstacle_distance = take_radar_reading();
+
+  if (obstacle_distance >= minimum_distance) {
+    return false;
+  }
+
+  return true;
+}
+
+////// LOOPS ///////
+
 void setup()
 {
   initialize_motor_driver();
@@ -119,8 +270,11 @@ void setup()
   initialize_radar_servo();
 
   stop_motors();
+
+
 }
 
 void loop()
 {
+
 }
