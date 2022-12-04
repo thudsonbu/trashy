@@ -33,6 +33,14 @@
 
 const int minimum_distance = 30; // Minimum distance from obstacle before evasive action
 
+struct {
+  bool west;
+  bool north_west;
+  bool north;
+  bool north_east;
+  bool east;
+} obstacles;
+
 Servo radar_servo;
 
 ////// UTILS //////
@@ -220,7 +228,7 @@ void initialize_ultrasonic_sensor()
   digitalWrite(TRIG_PIN, LOW);
 }
 
-// Attach radar servo to bin and check that radar servo is centered correctly.
+// Attach radar servo to pin and check that radar servo is centered correctly.
 void initialize_radar_servo()
 {
   radar_servo.attach(SERVO_PIN);
@@ -232,8 +240,13 @@ void initialize_radar_servo()
   delay(seconds(2));
 
   radar_servo.write(90);
-  delay(seconds(5));
+  delay(seconds(2));
 }
+
+const int max_radar_angle = 150;
+const int min_radar_angle = 30;
+
+long int next_radar_update = 1e3;
 
 // Take a reading from the ultrasonic sensor
 int take_radar_reading()
@@ -269,6 +282,44 @@ bool check_for_obstacle()
   return true;
 }
 
+int radar_angle = 90;
+int radar_direction = 1;
+int radar_increment = 30;
+
+// Update the radar location on each loop. For most loops, the radar is just
+// waiting.
+void update_radar() {
+  if (millis() >= next_radar_update) {
+
+    next_radar_update += 1e3;
+
+    radar_angle += radar_increment * radar_direction;
+
+    if (radar_angle >= max_radar_angle) {
+      radar_direction = -1;
+    } else if (radar_angle <= min_radar_angle) {
+      radar_direction = 1;
+    }
+
+    radar_servo.write(radar_angle);
+  }
+}
+
+void update_obstacles()
+{
+  if (radar_angle == 30) {
+    obstacles.west = check_for_obstacle();
+  } else if (radar_angle == 60) {
+    obstacles.north_west = check_for_obstacle();
+  } else if (radar_angle == 90) {
+    obstacles.north = check_for_obstacle();
+  } else if (radar_angle == 120) {
+    obstacles.north_east = check_for_obstacle();
+  } else if (radar_angle == 150) {
+    obstacles.east = check_for_obstacle();
+  }
+}
+
 ////// LOOPS ///////
 
 void setup()
@@ -284,12 +335,5 @@ void setup()
 
 void loop()
 {
-  if (check_for_obstacle()) {
-    stop_motors();
-    rotate_left();
-    delay(seconds(1));
-    stop_motors();
-  } else {
-    go_forward();
-  }
+  update_radar();
 }
