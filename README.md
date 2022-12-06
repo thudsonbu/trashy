@@ -2,6 +2,10 @@
 
 Trashy is a robot that picks up trash and takes it to the trash can.
 
+# Links
+
+[Kanban](https://www.notion.so/thomashudsonnotes/22aa2c6aa8a94105ba4faa318eaf19f8?v=717dc4cc0a704bef925d1b067d7177be)
+
 # Getting Started
 
 ## Setup
